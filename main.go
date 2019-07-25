@@ -376,11 +376,11 @@ func (c *Controller) writeFile(ruleConfigMapDict map[string]bool, groups MultiRu
 	log.Println(ruleConfigMapDict)
 	log.Println(lastRuleConfigMapsDict)
 	if len(ruleConfigMapDict) != len(lastRuleConfigMapsDict) {
-		log.Printf("Configmap count changed. now: %d, prev: %d.", len(ruleConfigMapDict), len(lastRuleConfigMapsDict))
+		log.Printf("Configmap count changed. now: %d, prev: %d\n", len(ruleConfigMapDict), len(lastRuleConfigMapsDict))
 		ruleConfigMapCountChanged = true
 		lastRuleConfigMapsDict = ruleConfigMapDict
 	} else {
-		fmt.Printf("Configmap count unchanged. now: %d, prev: %d.", len(ruleConfigMapDict), len(lastRuleConfigMapsDict))
+		log.Printf("Configmap count unchanged. now: %d, prev: %d\n", len(ruleConfigMapDict), len(lastRuleConfigMapsDict))
 	}
 
 
