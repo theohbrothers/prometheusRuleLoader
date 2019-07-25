@@ -208,7 +208,7 @@ func (c *Controller) buildNewRules() (map[string]bool, MultiRuleGroups, error) {
 		fmt.Println(err)
 	}
 
-	return ruleConfigMapDict, ruleGroups, err
+	return ruleConfigMapDict, ruleGroups, nil
 }
 
 func (c *Controller) processConfigMaps(mapList *v1.ConfigMapList) (map[string]bool, MultiRuleGroups, error) {
