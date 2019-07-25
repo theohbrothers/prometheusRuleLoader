@@ -51,6 +51,7 @@ var (
 
 	clientset *kubernetes.Clientset
 	lastSha  string
+	lastRuleConfigMapsDict = map[string]bool{}
 )
 
 const (
@@ -150,12 +151,12 @@ func (c *Controller) processNextItem() bool {
 
 	defer c.queue.Done(key)
 
-	configmapRuleGroups, err := c.buildNewRules()
+	ruleConfigMapDict, configmapRuleGroups, err := c.buildNewRules()
 	if err != nil {
 		log.Printf("Unable to build new rules file with error: %s\n", err)
 	}
 
-	reloadcheck, err := c.writeFile(configmapRuleGroups)
+	reloadcheck, err := c.writeFile(ruleConfigMapDict, configmapRuleGroups)
 	if reloadcheck {
 		c.tryReloadEndpoint(*reloadEndpoint)
 	}
@@ -195,22 +196,23 @@ func (c *Controller) runWorker() {
 	}
 }
 
-func (c *Controller) buildNewRules() ( MultiRuleGroups, error) {
+func (c *Controller) buildNewRules() (map[string]bool, MultiRuleGroups, error) {
 
 	mapList, err := clientset.CoreV1().ConfigMaps(v1.NamespaceAll).List(meta_v1.ListOptions{})
 	if err != nil {
-		return MultiRuleGroups{}, err
+		return map[string]bool{}, MultiRuleGroups{}, err
 	}
 
-	ruleGroups, err := c.processConfigMaps(mapList)
+	ruleConfigMapDict, ruleGroups, err := c.processConfigMaps(mapList)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	return ruleGroups, nil
+	return ruleConfigMapDict, ruleGroups, err
 }
 
-func (c *Controller) processConfigMaps(mapList *v1.ConfigMapList) (MultiRuleGroups, error) {
+func (c *Controller) processConfigMaps(mapList *v1.ConfigMapList) (map[string]bool, MultiRuleGroups, error) {
+	ruleConfigMapDict := map[string]bool{}
 	ruleGroups := MultiRuleGroups{}
 	errors := make([]error, 0)
 
@@ -229,7 +231,7 @@ func (c *Controller) processConfigMaps(mapList *v1.ConfigMapList) (MultiRuleGrou
 					errors = append(errors, err)
 				}
 
-
+				ruleConfigMapDict[namespace + "_" + name] = true
 				ruleGroups.Values = append(ruleGroups.Values, g.Values...)
 
 			}
@@ -237,7 +239,7 @@ func (c *Controller) processConfigMaps(mapList *v1.ConfigMapList) (MultiRuleGrou
 	}
 	reterr := assembleErrors(errors)
 
-	return ruleGroups, reterr
+	return ruleConfigMapDict, ruleGroups, reterr
 }
 
 func (c *Controller) extractValues(fallbackNameStub string, data map[string]string) (MultiRuleGroups, error) {
@@ -363,17 +365,29 @@ func (c *Controller) removeRules(group *rulefmt.RuleGroup, list []int) {
 	}
 }
 
-func (c *Controller) writeFile(groups MultiRuleGroups) (bool, error) {
+func (c *Controller) writeFile(ruleConfigMapDict map[string]bool, groups MultiRuleGroups) (bool, error) {
 
 	filegroup := rulefmt.RuleGroups{}
 	for _, v := range groups.Values {
 		filegroup.Groups = append(filegroup.Groups, v.Groups...)
 	}
 
+	ruleConfigMapCountChanged := false
+	log.Println(ruleConfigMapDict)
+	log.Println(lastRuleConfigMapsDict)
+	if len(ruleConfigMapDict) != len(lastRuleConfigMapsDict) {
+		log.Printf("Configmap count changed. now: %d, prev: %d.", len(ruleConfigMapDict), len(lastRuleConfigMapsDict))
+		ruleConfigMapCountChanged = true
+		lastRuleConfigMapsDict = ruleConfigMapDict
+	} else {
+		fmt.Printf("Configmap count unchanged. now: %d, prev: %d.", len(ruleConfigMapDict), len(lastRuleConfigMapsDict))
+	}
+
+
 	if len(filegroup.Groups) > 0 {
 		rulesyaml, err := yaml.Marshal(filegroup)
 		newSha := c.computeSha1(rulesyaml)
-		if lastSha != newSha {
+		if ruleConfigMapCountChanged || lastSha != newSha {
 			err = c.persistFile(rulesyaml, *rulesLocation)
 			if err != nil {
 				return false, err
@@ -382,6 +396,16 @@ func (c *Controller) writeFile(groups MultiRuleGroups) (bool, error) {
 			return true, nil
 		}
 		log.Println("No changes, skipping write.")
+	}else {
+		if ruleConfigMapCountChanged {
+			text := []byte(``)
+			err := c.persistFile(text, *rulesLocation)
+			if err != nil {
+				return false, err
+			}
+			log.Println("Empty rules file.")
+			return true, nil
+		}
 	}
 	log.Println("No rules to write.")
 	return false, nil
