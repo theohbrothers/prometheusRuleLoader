@@ -23,7 +23,10 @@ export CGO_ENABLED=1
 export GO111MODULE="$GO111MODULE"
 export GOFLAGS="$GOFLAGS"
 
-TARGETS=$(for d in "$@"; do echo ./$d/...; done)
+TARGETS=$(for d in "$@"; do echo $(pwd)/$d/...; done)
+if [ -z "$TARGETS" ]; then
+    TARGETS=$(pwd)
+fi
 
 echo "Running tests:"
 # go test -installsuffix "static" ${TARGETS}
@@ -35,7 +38,7 @@ fi
 echo
 
 echo -n "Checking gofmt: "
-ERRS=$(find "$@" -type f -name \*.go | xargs gofmt -l 2>&1 || true)
+ERRS=$(find "$TARGETS" -type f -name \*.go -not -path "$BUILD_GOPATH/*" | xargs gofmt -l 2>&1 || true)
 if [ -n "${ERRS}" ]; then
     echo "FAIL - the following files need to be gofmt'ed:"
     for e in ${ERRS}; do

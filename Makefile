@@ -253,6 +253,7 @@ test: $(BUILD_DIRS)
 		-u $$(id -u):$$(id -g) \
 		-v $(PWD):$(PWD) \
 		-w $(PWD) \
+		-e "BUILD_GOPATH=$(BUILD_GOPATH)" \
 		-v $(BUILD_GOPATH):/go \
 		-v $(BUILD_GOCACHE):/.cache \
 		--env HTTP_PROXY=$(HTTP_PROXY) \
