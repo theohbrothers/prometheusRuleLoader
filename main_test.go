@@ -224,7 +224,7 @@ func TestBadRule(t *testing.T) {
 	cmList := v1.ConfigMapList{Items: []v1.ConfigMap{cm1}}
 
 	Convey("Processing list of configmaps", t, func() {
-		mrg, err := c.processConfigMaps(&cmList)
+		_, mrg, err := c.processConfigMaps(&cmList)
 
 		So(err, ShouldNotBeNil)
 		So(len(mrg.Values), ShouldEqual, 2)
@@ -277,7 +277,7 @@ func TestCreateFile(t *testing.T) {
 	cmList := v1.ConfigMapList{Items: []v1.ConfigMap{cm1, cm2, cm3}}
 
 	Convey("Processing list of configmaps", t, func() {
-		mrg, err := c.processConfigMaps(&cmList)
+		_, mrg, err := c.processConfigMaps(&cmList)
 
 		So(err, ShouldBeNil)
 		So(len(mrg.Values), ShouldEqual, 2)
