@@ -35,5 +35,5 @@ RUN apk --no-cache add ca-certificates
 ARG OUTBIN
 COPY --from=builder $OUTBIN /$BIN
 ENV BIN=$BIN
+USER 65535:65535
 ENTRYPOINT /$BIN
-EXPOSE 26999
