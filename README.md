@@ -1,3 +1,12 @@
+# prometheusruleloader
+
+[![github-actions](https://github.com/theohbrothers/prometheusruleloader/workflows/ci/badge.svg)](https://github.com/theohbrothers/prometheusruleloader/actions)
+[![github-tag](https://img.shields.io/github/tag/theohbrothers/prometheusruleloader)](https://github.com/theohbrothers/prometheusruleloader/releases/)
+[![docker-image-size](https://img.shields.io/microbadger/image-size/theohbrothers/prometheusruleloader/latest)](https://hub.docker.com/r/theohbrothers/prometheusruleloader)
+[![docker-image-layers](https://img.shields.io/microbadger/layers/theohbrothers/prometheusruleloader/latest)](https://hub.docker.com/r/theohbrothers/prometheusruleloader)
+[![codecov](https://codecov.io/gh/theohbrothers/prometheusruleloader/branch/master/graph/badge.svg)](https://codecov.io/gh/theohbrothers/prometheusruleloader)
+[![go-report-card](https://goreportcard.com/badge/github.com/theohbrothers/prometheusruleloader)](https://goreportcard.com/report/github.com/theohbrothers/prometheusruleloader)
+
 ### New version contains breaking changes, see *Changes* below
 
 Handy Kubernetes sidecar for Prometheus 2.x. It watches for configmaps in all namespaces that have the annotation specified with the -annotation flag. When it finds one it pulls each value out and assumes it's a prometheus rule. It then validates them and adds them to a the rules file specified with -rulespath. If that file changes it hits the reload endpoint specified by the -endpoint flag.
@@ -55,4 +64,4 @@ Once all the appropriate configmaps are processed all the groups will be assembl
 
 Deployment
 ==========
-The prometheusruleloaders docker container should be deployed in the same pod as prometheus. They should both share a volume mount (and emptydir works fine here). prometheusruleloader will use this shared space to write it's rule file to, meanwhile Prometheus should be configured to look for it's rule file at this path.
+The prometheusruleloader docker container should be deployed in the same pod as prometheus. They should both share a volume mount (and emptydir works fine here). prometheusruleloader will use this shared space to write it's rule file to, meanwhile Prometheus should be configured to look for it's rule file at this path.
