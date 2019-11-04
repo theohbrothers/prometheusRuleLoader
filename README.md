@@ -1,6 +1,6 @@
 ### New version contains breaking changes, see *Changes* below
 
-Handy Kubernetes sidecar for Prometheus 2.x. It watches for configmaps in all namespaces that have the annotation specified with the -annotation flag. When it finds one it pulls each value out and assumes it's a prometheus rule. It then validates them and adds them to a the rules file specified with -rulespath. If that file changes it hits the reload endpoint specified by the -endpoint flag. 
+Handy Kubernetes sidecar for Prometheus 2.x. It watches for configmaps in all namespaces that have the annotation specified with the -annotation flag. When it finds one it pulls each value out and assumes it's a prometheus rule. It then validates them and adds them to a the rules file specified with -rulespath. If that file changes it hits the reload endpoint specified by the -endpoint flag.
 
 Changes
 =======
@@ -19,7 +19,7 @@ Parameters
 
 for example:
 
-`./PrometheusRuleLoader -rulespath ./rules.rules -annotation 'prometheus.io/v2/rules' -endpoint http://127.0.0.1:9090/-/reload`
+`./prometheusruleloader -rulespath ./rules.rules -annotation 'prometheus.io/v2/rules' -endpoint http://127.0.0.1:9090/-/reload`
 
 Configmap Annotation
 ====================
@@ -55,4 +55,4 @@ Once all the appropriate configmaps are processed all the groups will be assembl
 
 Deployment
 ==========
-The PrometheusRuleLoaders docker container should be deployed in the same pod as prometheus. They should both share a volume mount (and emptydir works fine here). PrometheusRuleLoader will use this shared space to write it's rule file to, meanwhile Prometheus should be configured to look for it's rule file at this path.
+The prometheusruleloaders docker container should be deployed in the same pod as prometheus. They should both share a volume mount (and emptydir works fine here). prometheusruleloader will use this shared space to write it's rule file to, meanwhile Prometheus should be configured to look for it's rule file at this path.
