@@ -38,7 +38,7 @@ VERSION = $(shell git describe --tags --exact-match 2>/dev/null || git symbolic-
 # Get the short SHA
 SHA_SHORT = $(shell git rev-parse --short HEAD)
 
-SRC_DIRS := pkg # directories which hold app source (not vendored)
+SRC_DIRS :=  # directories which hold app source (not vendored)
 
 ALL_PLATFORMS := linux/amd64 linux/arm linux/arm64 linux/ppc64le linux/s390x
 
