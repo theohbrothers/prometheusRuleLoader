@@ -1,4 +1,4 @@
-module github.com/nordstrom/prometheusRuleLoader
+module github.com/nordstrom/prometheusruleloader
 
 go 1.12
 

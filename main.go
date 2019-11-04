@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/nordstrom/prometheusRuleLoader/pkg/signals"
+	"github.com/nordstrom/prometheusruleloader/pkg/signals"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog"
 	"log"
