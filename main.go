@@ -467,7 +467,9 @@ func (c *Controller) computeSha1(s []byte) string {
 func assembleErrors(myerrors []error) error {
 	errorstring := ""
 	for _, v := range myerrors {
-		errorstring = fmt.Sprintf("%s, %s", errorstring, v)
+		if v != nil {
+			errorstring = fmt.Sprintf("%s, %s", errorstring, v)
+		}
 	}
 	if len(errorstring) > 0 {
 		return fmt.Errorf(errorstring)
