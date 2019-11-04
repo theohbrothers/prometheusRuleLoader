@@ -49,8 +49,8 @@ var (
 	kubeconfigPath = flag.String("kubeconfig", "", "Path to kubeconfig. Required for out of cluster operation.")
 	masterURL      = flag.String("master", "", "The address of the kube api server. Overrides the kubeconfig value, only require for off cluster operation.")
 
-	clientset *kubernetes.Clientset
-	lastSha  string
+	clientset              *kubernetes.Clientset
+	lastSha                string
 	lastRuleConfigMapsDict = map[string]bool{}
 )
 
@@ -221,17 +221,16 @@ func (c *Controller) processConfigMaps(mapList *v1.ConfigMapList) (map[string]bo
 		name := cm.GetObjectMeta().GetName()
 		namespace := cm.GetObjectMeta().GetNamespace()
 
-
 		for k := range anno {
 			if k == *configmapAnnotation {
 				log.Printf("Rule configmap found, processing: %s/%s\n", namespace, name)
 
-				g, err := c.extractValues( fmt.Sprintf("%s-%s", namespace, name), cm.Data )
+				g, err := c.extractValues(fmt.Sprintf("%s-%s", namespace, name), cm.Data)
 				if err != nil {
 					errors = append(errors, err)
 				}
 
-				ruleConfigMapDict[namespace + "_" + name] = true
+				ruleConfigMapDict[namespace+"_"+name] = true
 				ruleGroups.Values = append(ruleGroups.Values, g.Values...)
 
 			}
@@ -246,7 +245,7 @@ func (c *Controller) extractValues(fallbackNameStub string, data map[string]stri
 
 	// make a bucket for random non fully formed rulegroups (just a single rulegroup) to live
 	mrg := MultiRuleGroups{}
-	myerrors := make([]error,0)
+	myerrors := make([]error, 0)
 	for key, value := range data {
 		// fallback decoding, first try extracting a RuleGroups, then a RuleGroup, then []Rule
 		err, myrulegroups := c.extractRuleGroups(value)
@@ -260,27 +259,26 @@ func (c *Controller) extractValues(fallbackNameStub string, data map[string]stri
 					myerrors = append(myerrors, fmt.Errorf("Configmap: %s  key: %s does not conform to any of the legal formapts (RuleGroups, RuleGroup or []Rules. Skipping.", fallbackNameStub, key))
 				} else {
 					myrulegroups, err = c.validateRuleGroups(fallbackNameStub, key, myrulegroups)
-					myerrors = append(myerrors,err)
+					myerrors = append(myerrors, err)
 					mrg.Values = append(mrg.Values, myrulegroups)
 				}
 			} else {
 				mrg.Values = append(mrg.Values, myrulegroups)
-				myerrors = append(myerrors,err)
+				myerrors = append(myerrors, err)
 			}
 		} else {
 			mrg.Values = append(mrg.Values, myrulegroups)
-			myerrors = append(myerrors,err)
+			myerrors = append(myerrors, err)
 		}
 	}
 
 	reterr := assembleErrors(myerrors)
 
-
 	return mrg, reterr
 }
 
-func (c *Controller) extractRulesAsRuleGroups(fallbackName string, key string, value string) (error, rulefmt.RuleGroups){
-	rules := make([]rulefmt.Rule,0)
+func (c *Controller) extractRulesAsRuleGroups(fallbackName string, key string, value string) (error, rulefmt.RuleGroups) {
+	rules := make([]rulefmt.Rule, 0)
 	err := yaml.Unmarshal([]byte(value), &rules)
 	if err != nil {
 		return err, rulefmt.RuleGroups{}
@@ -299,7 +297,6 @@ func (c *Controller) extractRulesAsRuleGroups(fallbackName string, key string, v
 
 	return nil, wrapper
 }
-
 
 func (c *Controller) extractRuleGroupAsRuleGroups(value string) (error, rulefmt.RuleGroups) {
 	group := rulefmt.RuleGroup{}
@@ -333,11 +330,11 @@ func (c *Controller) extractRuleGroups(value string) (error, rulefmt.RuleGroups)
 func (c *Controller) validateRuleGroups(fallbackname string, keyname string, groups rulefmt.RuleGroups) (rulefmt.RuleGroups, error) {
 
 	// im not using rulegroups.Validate here because i think their current error processing is broken.
-	errors := make([]error,0)
+	errors := make([]error, 0)
 	for _, group := range groups.Groups {
 
 		for i, r := range group.Rules {
-			remove := make([]int,0)
+			remove := make([]int, 0)
 			for _, err := range r.Validate() {
 				if err != nil {
 					remove = append(remove, i)
@@ -359,7 +356,7 @@ func (c *Controller) validateRuleGroups(fallbackname string, keyname string, gro
 }
 
 func (c *Controller) removeRules(group *rulefmt.RuleGroup, list []int) {
-	for i := len(list)-1; i >=0; i-- {
+	for i := len(list) - 1; i >= 0; i-- {
 		v := list[i]
 		group.Rules = append(group.Rules[:v], group.Rules[v+1:]...)
 	}
@@ -383,7 +380,6 @@ func (c *Controller) writeFile(ruleConfigMapDict map[string]bool, groups MultiRu
 		log.Printf("Configmap count unchanged. now: %d, prev: %d\n", len(ruleConfigMapDict), len(lastRuleConfigMapsDict))
 	}
 
-
 	if len(filegroup.Groups) > 0 {
 		rulesyaml, err := yaml.Marshal(filegroup)
 		newSha := c.computeSha1(rulesyaml)
@@ -396,7 +392,7 @@ func (c *Controller) writeFile(ruleConfigMapDict map[string]bool, groups MultiRu
 			return true, nil
 		}
 		log.Println("No changes, skipping write.")
-	}else {
+	} else {
 		if ruleConfigMapCountChanged {
 			text := []byte(``)
 			err := c.persistFile(text, *rulesLocation)

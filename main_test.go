@@ -29,25 +29,25 @@ func TestMain(m *testing.M) {
 
 	// prepare test data
 	//mytime, _ := time.ParseDuration("10m")
-	testRulesObj := []rulefmt.Rule {
+	testRulesObj := []rulefmt.Rule{
 		rulefmt.Rule{
 			Record: "job:http_inprogress_requests:sum",
-			Expr: "sum(http_inprogress_requests) by (job)",
+			Expr:   "sum(http_inprogress_requests) by (job)",
 		},
 		rulefmt.Rule{
 			Alert: "HighErrorRate",
-			Expr: "job:request_latency_seconds:mean5m{job=\"myjob\"} > 0.5",
-			Labels: map[string]string {
+			Expr:  "job:request_latency_seconds:mean5m{job=\"myjob\"} > 0.5",
+			Labels: map[string]string{
 				"severity": "Page",
 			},
-			Annotations: map[string]string {
+			Annotations: map[string]string{
 				"summary": "High request latency",
 			},
 		},
 	}
 
 	testRuleGroupObj := rulefmt.RuleGroup{
-		Name: "TestGroup",
+		Name:  "TestGroup",
 		Rules: testRulesObj,
 	}
 
@@ -104,7 +104,7 @@ func TestExtractRuleGroups(t *testing.T) {
 
 		})
 
-		Convey( "Negative test case", func() {
+		Convey("Negative test case", func() {
 			err, rulegroups := c.extractRuleGroups(string(testRuleGroup))
 
 			So(err, ShouldNotBeNil)
@@ -152,14 +152,13 @@ func TestExtractRulesAsRuleGroups(t *testing.T) {
 			So(len(rulegroups.Groups), ShouldEqual, 0)
 		})
 
-
 	})
 }
 
 func TestExtractValues(t *testing.T) {
 	Convey("Test extractValues no matter what of the possible rules formats it should return a good rulesgroups", t, func() {
 		Convey("If we pass it just rules it should return a good rulesgroups", func() {
-			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockRules.Data )
+			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockRules.Data)
 
 			So(err, ShouldBeNil)
 			So(len(mrg.Values), ShouldEqual, 1)
@@ -168,7 +167,7 @@ func TestExtractValues(t *testing.T) {
 		})
 
 		Convey("If we pass it a rulegroup it should return a good rulesgroups", func() {
-			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockRulesGroup.Data )
+			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockRulesGroup.Data)
 
 			So(err, ShouldBeNil)
 			So(len(mrg.Values), ShouldEqual, 1)
@@ -177,7 +176,7 @@ func TestExtractValues(t *testing.T) {
 		})
 
 		Convey("If we pass it a rulegroups it should return a good rulesgroups", func() {
-			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockRulesGroup.Data )
+			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockRulesGroup.Data)
 
 			So(err, ShouldBeNil)
 			So(len(mrg.Values), ShouldEqual, 1)
@@ -186,7 +185,7 @@ func TestExtractValues(t *testing.T) {
 		})
 
 		Convey("If we pass it all three we should return three rulesgroups", func() {
-			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockAllThree.Data )
+			mrg, err := c.extractValues("aaaa-bbbb", configmapDataBlockAllThree.Data)
 
 			So(err, ShouldBeNil)
 			So(len(mrg.Values), ShouldEqual, 3)
@@ -201,8 +200,6 @@ func TestExtractValues(t *testing.T) {
 
 	})
 }
-
-
 
 func TestBadRule(t *testing.T) {
 	cm1d := map[string]string{
