@@ -24,6 +24,29 @@ jobs:
         sudo -s /bin/sh -c 'make test' # Force make to run docker under root user
         bash <(curl -s https://codecov.io/bash)
 
+  build:
+    needs: [test]
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64]
+    runs-on: ubuntu-latest
+    env:
+      GOOS: ${{ matrix.os }}
+      GOARCH: ${{ matrix.arch }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: |
+        set -e
+        make build "GOOS=$GOOS" "GOARCH=$GOARCH"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: binaries
+        path: |
+          ./.go/bin/*
+
   build-docker-image:
     needs: [test]
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
@@ -31,7 +54,6 @@ jobs:
       matrix:
         os: [linux, darwin, windows]
         arch: [amd64]
-    name: build-docker-image
     runs-on: ubuntu-latest
     env:
       GOOS: ${{ matrix.os }}
@@ -54,7 +76,7 @@ jobs:
       if: always()
 
   update-draft-release:
-    needs: [test, build-docker-image]
+    needs: [test, build, build-docker-image]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
@@ -68,35 +90,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:
-    needs: [test, build-docker-image]
+    needs: [test, build, build-docker-image, update-draft-release]
     if: startsWith(github.ref, 'refs/tags/')
-    strategy:
-      matrix:
-        os: [linux, darwin, windows]
-        arch: [amd64]
-    name: release
     runs-on: ubuntu-latest
-    env:
-      GOOS: ${{ matrix.os }}
-      GOARCH: ${{ matrix.arch }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: |
-        set -e
-        make build "GOOS=$GOOS" "GOARCH=$GOARCH"
     # Drafts your next Release notes as Pull Requests are merged into "master"
-    - name: create_release
+    - name: release-drafter
       uses: release-drafter/release-drafter@v5
       with:
-        config-name: release-drafter.yaml
-        publish: true
+        config-name: release-drafter.yml
+        publish: false
         name: ${{  github.ref_name }}
         tag: ${{  github.ref_name }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - uses: actions/upload-artifact@v3
+    - uses: actions/download-artifact@v3
       with:
         name: binaries
         path: |
+          ./.go/bin/*
+    - uses: softprops/action-gh-release@v1
+      with:
+        body: ${{ steps.release-drafter.outputs.body }}
+        files: |
           ./.go/bin/*
