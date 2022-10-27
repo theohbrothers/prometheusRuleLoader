@@ -108,7 +108,7 @@ jobs:
       with:
         name: binaries
         path: |
-          ./.go/bin/*
+          ./.go/bin
     - uses: softprops/action-gh-release@v1
       with:
         body: ${{ steps.release-drafter.outputs.body }}
