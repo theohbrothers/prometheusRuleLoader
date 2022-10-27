@@ -1,9 +1,8 @@
 # prometheusruleloader
 
 [![github-actions](https://github.com/theohbrothers/prometheusruleloader/workflows/ci/badge.svg)](https://github.com/theohbrothers/prometheusruleloader/actions)
-[![github-tag](https://img.shields.io/github/tag/theohbrothers/prometheusruleloader)](https://github.com/theohbrothers/prometheusruleloader/releases/)
-[![docker-image-size](https://img.shields.io/microbadger/image-size/theohbrothers/prometheusruleloader/latest)](https://hub.docker.com/r/theohbrothers/prometheusruleloader)
-[![docker-image-layers](https://img.shields.io/microbadger/layers/theohbrothers/prometheusruleloader/latest)](https://hub.docker.com/r/theohbrothers/prometheusruleloader)
+[![github-release](https://img.shields.io/github/v/release/theohbrothers/prometheusruleloader?style=flat-square)](https://github.com/theohbrothers/prometheusruleloader/releases/)
+[![docker-image-size](https://img.shields.io/docker/image-size/theohbrothers/prometheusruleloader/latest)](https://hub.docker.com/r/theohbrothers/prometheusruleloader)
 [![codecov](https://codecov.io/gh/theohbrothers/prometheusruleloader/branch/master/graph/badge.svg)](https://codecov.io/gh/theohbrothers/prometheusruleloader)
 [![go-report-card](https://goreportcard.com/badge/github.com/theohbrothers/prometheusruleloader)](https://goreportcard.com/report/github.com/theohbrothers/prometheusruleloader)
 
