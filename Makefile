@@ -33,8 +33,8 @@ REGISTRY_USER ?= theohbrothers
 ###
 
 # This version-strategy uses git tags to set the version string
-# Get the following from left to right: tag > branch > branch of detached HEAD commit
-VERSION = $(shell git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD 2>/dev/null || git name-rev --name-only "$$( git rev-parse --short HEAD )" | sed 's@remotes/origin/@@' | sed 's@~.*@@' )
+# Get the following from left to right: 1) tag, 2) ref, 3) sha
+VERSION = $(shell git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD 2>/dev/null | grep -v '/' || git rev-parse --short HEAD)
 # Get the short SHA
 SHA_SHORT = $(shell git rev-parse --short HEAD)
 
