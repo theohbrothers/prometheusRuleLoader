@@ -12,7 +12,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
@@ -42,7 +42,7 @@ jobs:
         os: [linux, darwin, windows]
         arch: [amd64]
     name: build-docker-image-${{ matrix.os }}-${{ matrix.arch }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GOOS: ${{ matrix.os }}
       GOARCH: ${{ matrix.arch }}
@@ -91,7 +91,7 @@ jobs:
         os: [linux, darwin, windows]
         arch: [amd64]
     name: release-${{ matrix.os }}-${{ matrix.arch }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       GOOS: ${{ matrix.os }}
       GOARCH: ${{ matrix.arch }}
