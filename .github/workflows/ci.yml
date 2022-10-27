@@ -113,5 +113,6 @@ jobs:
       with:
         name: ${{ github.ref_name }}
         tag_name: ${{ github.ref_name }}
+        body: ${{ steps.release-drafter.outputs.body }}
         files: |
           ./.go/bin/*
